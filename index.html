@@ -1,0 +1,1115 @@
+import React, { useState } from 'react';
+import { 
+  ShoppingBag, 
+  Search, 
+  ShieldCheck, 
+  Plus, 
+  Trash2, 
+  Edit3, 
+  X, 
+  CheckCircle, 
+  Info, 
+  ChevronDown, 
+  Menu, 
+  Phone, 
+  Mail, 
+  MapPin, 
+  Award, 
+  Star, 
+  User, 
+  LogOut, 
+  Clock, 
+  DollarSign, 
+  Monitor, 
+  Sparkles, 
+  Truck, 
+  Feather, 
+  Facebook, 
+  Instagram, 
+  Twitter, 
+  Send,
+  LayoutDashboard
+} from 'lucide-react';
+
+const INITIAL_PRODUCTS = [
+  {
+    id: 'p1',
+    name: "RIR Starter Pullet (4 Months)",
+    ageCategory: "4 Months Old",
+    breed: "RHODE ISLAND RED",
+    price: 350,
+    stock: 45,
+    rating: 4.8,
+    reviewsCount: 24,
+    weight: "1.2 kg - 1.5 kg",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2fGySgZ0COrDDFjDWVnKAGXFXmF8A1FDpO3MGF0WPP7TqHuOX0ci84JQR&s=10",
+    description: "Healthy 4-month-old Rhode Island Red pullet. Well-feathered, active, and fully vaccinated for ND-IB and Marek's disease. Great starter chicken for egg production.",
+    healthStatus: "Fully Vaccinated (NDV, Marek's, Avian Pox)",
+    eggPotential: "Est. 250 - 280 brown eggs/year once mature"
+  },
+  {
+    id: 'p2',
+    name: "Black Australorp Grower (4 Months)",
+    ageCategory: "4 Months Old",
+    breed: "BLACK AUSTRALORP",
+    price: 380,
+    stock: 30,
+    rating: 4.9,
+    reviewsCount: 18,
+    weight: "1.3 kg - 1.6 kg",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2fGySgZ0COrDDFjDWVnKAGXFXmF8A1FDpO3MGF0WPP7TqHuOX0ci84JQR&s=10",
+    description: "Hardy 4-month-old Black Australorp pullet. Docile temperament and excellent foraging ability. Perfect for backyard climate resilience.",
+    healthStatus: "Dewormed & Vaccinated",
+    eggPotential: "Est. 280+ eggs/year"
+  },
+  {
+    id: 'p3',
+    name: "Ready-To-Lay Sussex (5 Months)",
+    ageCategory: "5 Months Old",
+    breed: "LIGHT SUSSEX",
+    price: 480,
+    stock: 22,
+    rating: 4.9,
+    reviewsCount: 31,
+    weight: "1.8 kg - 2.1 kg",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjxaafZv2vi9Fs1wxYjPm4qMrAfo6XlrmgmAid9FP_tA&s=10",
+    description: "5-month-old Light Sussex chicken nearing point of lay. Comb is developing nicely with vibrant color. Robust dual-purpose bird.",
+    healthStatus: "Complete Deworming & Booster Shots",
+    eggPotential: "Est. 260 cream/tinted eggs/year"
+  },
+  {
+    id: 'p4',
+    name: "Dominant CZ Point-Of-Lay (5 Months)",
+    ageCategory: "5 Months Old",
+    breed: "DOMINANT CZ HYBRID",
+    price: 520,
+    stock: 15,
+    rating: 5.0,
+    reviewsCount: 42,
+    weight: "1.9 kg - 2.2 kg",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjxaafZv2vi9Fs1wxYjPm4qMrAfo6XlrmgmAid9FP_tA&s=10",
+    description: "Premium 5-month point-of-lay layer. Strong immunity, adapted to warm tropical climates, expected to begin laying in 2-3 weeks.",
+    healthStatus: "Fully Conditioned & Dewormed",
+    eggPotential: "Est. 300 large brown eggs/year"
+  },
+  {
+    id: 'p5',
+    name: "Heritage Breeding Pair (6+ Months)",
+    ageCategory: "6 Months Old & Older",
+    breed: "HERITAGE DUAL PURPOSE",
+    price: 1100,
+    stock: 8,
+    rating: 4.9,
+    reviewsCount: 15,
+    weight: "Cock: 3.2kg | Hen: 2.5kg",
+    image: "https://upload.wikimedia.org/wikipedia/commons/8/84/Male_and_female_chicken_sitting_together.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original",
+    description: "Prime 6-month-old breeding pair (1 rooster and 1 hen). Excellent fertility history, ideal for starter hatcheries and breed propagation.",
+    healthStatus: "Breeder Conditioned, Vaccinated & Vitamins Given",
+    eggPotential: "Active Layers & High Fertility Rate"
+  },
+  {
+    id: 'p6',
+    name: "Active Laying Hen (6+ Months)",
+    ageCategory: "6 Months Old & Older",
+    breed: "LEGHORN CROSS",
+    price: 580,
+    stock: 25,
+    rating: 4.7,
+    reviewsCount: 29,
+    weight: "2.0 kg",
+    image: "https://upload.wikimedia.org/wikipedia/commons/8/84/Male_and_female_chicken_sitting_together.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original",
+    description: "Mature 7-month-old active egg layer currently producing daily eggs. Ideal choice for immediate egg harvesting.",
+    healthStatus: "Peak Productivity & Fully Vaccinated",
+    eggPotential: "Currently Laying Daily"
+  }
+];
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'menu' | 'about' | 'admin'
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // User Authentication States
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
+  const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
+
+  // Newsletter State
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+
+  // Products and Cart States
+  const [products, setProducts] = useState(INITIAL_PRODUCTS);
+  const [cart, setCart] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [detailProduct, setDetailProduct] = useState(null);
+
+  // Toast Notification State
+  const [toastMessage, setToastMessage] = useState(null);
+
+  // Admin Modal States
+  const [adminModalOpen, setAdminModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [adminForm, setAdminForm] = useState({
+    name: '',
+    ageCategory: '4 Months Old',
+    breed: '',
+    price: '',
+    stock: '',
+    image: '',
+    description: '',
+    healthStatus: 'Fully Vaccinated',
+    eggPotential: ''
+  });
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
+  };
+
+  const addToCart = (product) => {
+    setCart(prevCart => {
+      const existing = prevCart.find(item => item.id === product.id);
+      if (existing) {
+        return prevCart.map(item =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      return [...prevCart, { ...product, quantity: 1 }];
+    });
+    showToast(`Added ${product.name} to order!`);
+  };
+
+  const updateCartQuantity = (id, delta) => {
+    setCart(prevCart =>
+      prevCart
+        .map(item => {
+          if (item.id === id) {
+            const newQty = item.quantity + delta;
+            return newQty > 0 ? { ...item, quantity: newQty } : null;
+          }
+          return item;
+        })
+        .filter(Boolean)
+    );
+  };
+
+  const removeFromCart = (id) => {
+    setCart(prevCart => prevCart.filter(item => item.id !== id));
+    showToast('Item removed from cart.');
+  };
+
+  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const handleAuthSubmit = (e) => {
+    e.preventDefault();
+    if (!authForm.email || !authForm.password) {
+      showToast('Please fill out required fields.');
+      return;
+    }
+    const user = {
+      name: authForm.name || authForm.email.split('@')[0],
+      email: authForm.email,
+      role: authForm.email.includes('admin') ? 'Admin' : 'Customer'
+    };
+    setCurrentUser(user);
+    setIsAuthModalOpen(false);
+    showToast(`Welcome ${user.name}!`);
+    setAuthForm({ name: '', email: '', password: '' });
+  };
+
+  const handleOpenAdminModal = (prod = null) => {
+    if (prod) {
+      setEditingProduct(prod);
+      setAdminForm({ ...prod });
+    } else {
+      setEditingProduct(null);
+      setAdminForm({
+        name: '',
+        ageCategory: '4 Months Old',
+        breed: '',
+        price: '',
+        stock: '',
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2fGySgZ0COrDDFjDWVnKAGXFXmF8A1FDpO3MGF0WPP7TqHuOX0ci84JQR&s=10',
+        description: '',
+        healthStatus: 'Fully Vaccinated',
+        eggPotential: 'Est. 250+ eggs/year'
+      });
+    }
+    setAdminModalOpen(true);
+  };
+
+  const handleSaveProduct = (e) => {
+    e.preventDefault();
+    if (!adminForm.name || !adminForm.price || !adminForm.stock) {
+      showToast('Please complete all required fields.');
+      return;
+    }
+
+    if (editingProduct) {
+      setProducts(prev =>
+        prev.map(p => (p.id === editingProduct.id ? { ...p, ...adminForm, price: Number(adminForm.price), stock: Number(adminForm.stock) } : p))
+      );
+      showToast('Chicken listing updated successfully!');
+    } else {
+      const newProd = {
+        ...adminForm,
+        id: 'p_' + Date.now(),
+        price: Number(adminForm.price),
+        stock: Number(adminForm.stock),
+        rating: 5.0,
+        reviewsCount: 1,
+        weight: '1.5 kg'
+      };
+      setProducts(prev => [newProd, ...prev]);
+      showToast('New chicken listing created!');
+    }
+    setAdminModalOpen(false);
+  };
+
+  const handleDeleteProduct = (id) => {
+    if (window.confirm('Delete this chicken listing?')) {
+      setProducts(prev => prev.filter(p => p.id !== id));
+      showToast('Listing deleted.');
+    }
+  };
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (newsletterEmail) {
+      showToast('Thank you for subscribing to Jasmine\'s Poultry!');
+      setNewsletterEmail('');
+    }
+  };
+
+  const filteredProducts = products.filter(product => {
+    const matchesCategory =
+      selectedCategory === 'All' || product.ageCategory === selectedCategory;
+    const matchesSearch =
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.breed.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  return (
+    <div className="min-h-screen bg-stone-100 text-stone-800 flex flex-col font-serif selection:bg-amber-800 selection:text-white">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-5 right-5 z-50 bg-[#6E300B] text-amber-100 px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-amber-600 animate-bounce font-sans">
+          <CheckCircle className="w-5 h-5 text-amber-400" />
+          <span className="font-semibold text-sm">{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Header Bar */}
+      <header className="sticky top-0 z-40 bg-[#8B3E0C] text-white shadow-md font-sans">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
+          
+          {/* Logo with Chicken Icon */}
+          <div 
+            onClick={() => setActiveTab('home')}
+            className="flex items-center gap-3 cursor-pointer group"
+          >
+            <div className="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center border-2 border-white shadow-inner">
+              <span className="text-xl">🐔</span>
+            </div>
+            <span className="text-xl sm:text-2xl font-bold tracking-tight text-white font-serif">
+              Jasmine's <span className="text-amber-200">Poultry</span>
+            </span>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold tracking-wide">
+            <button
+              onClick={() => setActiveTab('home')}
+              className={`pb-1 transition-all ${
+                activeTab === 'home'
+                  ? 'border-b-2 border-white text-white font-bold'
+                  : 'text-stone-200 hover:text-white'
+              }`}
+            >
+              Home
+            </button>
+            <button
+              onClick={() => setActiveTab('menu')}
+              className={`pb-1 transition-all ${
+                activeTab === 'menu'
+                  ? 'border-b-2 border-white text-white font-bold'
+                  : 'text-stone-200 hover:text-white'
+              }`}
+            >
+              Chickens
+            </button>
+            <button
+              onClick={() => setActiveTab('about')}
+              className={`pb-1 transition-all ${
+                activeTab === 'about'
+                  ? 'border-b-2 border-white text-white font-bold'
+                  : 'text-stone-200 hover:text-white'
+              }`}
+            >
+              About
+            </button>
+            <button
+              onClick={() => setActiveTab('admin')}
+              className={`pb-1 transition-all ${
+                activeTab === 'admin'
+                  ? 'border-b-2 border-white text-white font-bold'
+                  : 'text-amber-200 hover:text-white'
+              }`}
+            >
+              Admin Panel
+            </button>
+          </nav>
+
+          {/* Right Header Controls */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="flex items-center gap-2 hover:text-amber-200 text-sm font-semibold transition-colors"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              <span>Cart</span>
+              {cart.length > 0 && (
+                <span className="bg-amber-400 text-stone-900 font-extrabold text-[11px] rounded-full px-2 py-0.5 ml-0.5">
+                  {cart.reduce((a, c) => a + c.quantity, 0)}
+                </span>
+              )}
+            </button>
+
+            {currentUser ? (
+              <div className="hidden sm:flex items-center gap-2 bg-[#6E300B] px-3 py-1.5 rounded-lg text-xs font-sans">
+                <User className="w-3.5 h-3.5 text-amber-300" />
+                <span>{currentUser.name}</span>
+                <button onClick={() => setCurrentUser(null)} className="ml-1 text-amber-200 hover:text-white">
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => { setAuthMode('login'); setIsAuthModalOpen(true); }}
+                className="hidden sm:block text-xs bg-amber-200 hover:bg-amber-100 text-amber-950 font-bold px-3.5 py-1.5 rounded-lg transition-all font-sans"
+              >
+                Log In
+              </button>
+            )}
+
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-1 text-white hover:text-amber-200"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-[#6E300B] px-6 py-4 space-y-3 font-sans border-t border-amber-900">
+            <button
+              onClick={() => { setActiveTab('home'); setMobileMenuOpen(false); }}
+              className="block w-full text-left py-1 text-amber-100 hover:text-white font-medium"
+            >
+              Home
+            </button>
+            <button
+              onClick={() => { setActiveTab('menu'); setMobileMenuOpen(false); }}
+              className="block w-full text-left py-1 text-amber-100 hover:text-white font-medium"
+            >
+              Chickens Catalog
+            </button>
+            <button
+              onClick={() => { setActiveTab('about'); setMobileMenuOpen(false); }}
+              className="block w-full text-left py-1 text-amber-100 hover:text-white font-medium"
+            >
+              About Us
+            </button>
+            <button
+              onClick={() => { setActiveTab('admin'); setMobileMenuOpen(false); }}
+              className="block w-full text-left py-1 text-amber-200 hover:text-white font-medium"
+            >
+              Admin Panel
+            </button>
+          </div>
+        )}
+      </header>
+
+      {/* Main Content Areas */}
+      <main className="flex-grow">
+        {(activeTab === 'home' || activeTab === 'menu') && (
+          <div>
+            {/* Hero Section */}
+            <section className="relative bg-[#8B3E0C] text-white py-20 px-4 sm:px-8 overflow-hidden min-h-[480px] flex items-center justify-center">
+              <div 
+                className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-overlay"
+                style={{
+                  backgroundImage: `url('https://upload.wikimedia.org/wikipedia/commons/8/84/Male_and_female_chicken_sitting_together.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original')`
+                }}
+              />
+              <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6">
+                <h1 className="text-4xl sm:text-6xl font-serif font-medium tracking-tight leading-tight text-white drop-shadow-md">
+                  Experience Quality &<br />
+                  <span className="italic font-normal">Healthy Chickens</span>
+                </h1>
+                <p className="text-amber-100/90 text-sm sm:text-lg max-w-2xl mx-auto font-sans font-light leading-relaxed">
+                  Healthy, vaccinated, high-yield chicken breeds raised naturally for egg laying and breeding stock.
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-4 pt-4 font-sans">
+                  <button 
+                    onClick={() => setActiveTab('menu')}
+                    className="bg-[#6E300B] hover:bg-[#592607] text-white px-7 py-3 rounded-xl font-medium text-sm border border-amber-900/50 shadow-lg transition-all"
+                  >
+                    Explore Our Chickens
+                  </button>
+                  <button 
+                    onClick={() => setIsCartOpen(true)}
+                    className="bg-[#FFE5B4] hover:bg-amber-100 text-stone-900 px-7 py-3 rounded-xl font-semibold text-sm shadow-lg transition-all"
+                  >
+                    Place Pre-Order
+                  </button>
+                </div>
+                <div className="pt-8 flex justify-center text-amber-200/70">
+                  <ChevronDown className="w-6 h-6 animate-bounce" />
+                </div>
+              </div>
+            </section>
+
+            {/* Sub-Banner Header */}
+            <section className="bg-[#8B3E0C] text-white py-12 px-4 text-center">
+              <div className="max-w-4xl mx-auto space-y-2">
+                <h2 className="text-3xl sm:text-4xl font-serif font-medium text-amber-100">
+                  Freshly Conditioned, Ready for Pickup
+                </h2>
+                <p className="text-amber-200/80 text-xs sm:text-sm font-sans max-w-xl mx-auto">
+                  Order your choice chickens online and pick up healthy livestock at your convenience.
+                </p>
+              </div>
+            </section>
+
+            {/* Feature Cards */}
+            <section className="py-12 px-4 sm:px-8 max-w-7xl mx-auto -mt-6">
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="bg-white p-8 rounded-2xl shadow-sm text-center space-y-4 border border-stone-200 font-sans">
+                  <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mx-auto text-amber-900">
+                    <DollarSign className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-bold text-stone-900 font-serif">Healthy & Fully Vaccinated</h3>
+                  <p className="text-xs text-stone-600 leading-relaxed">
+                    Every chicken receives complete vaccine routines and vitamins for maximum health.
+                  </p>
+                </div>
+
+                <div className="bg-white p-8 rounded-2xl shadow-sm text-center space-y-4 border border-stone-200 font-sans">
+                  <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mx-auto text-amber-900">
+                    <Monitor className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-bold text-stone-900 font-serif">Easy Online Pre-Order</h3>
+                  <p className="text-xs text-stone-600 leading-relaxed">
+                    Browse poultry by age category, pick your preferred breeds, and reserve easily.
+                  </p>
+                </div>
+
+                <div className="bg-white p-8 rounded-2xl shadow-sm text-center space-y-4 border border-stone-200 font-sans">
+                  <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mx-auto text-amber-900">
+                    <Clock className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-bold text-stone-900 font-serif">Pickup at Your Convenience</h3>
+                  <p className="text-xs text-stone-600 leading-relaxed">
+                    Choose a pickup time that fits your farm schedule—birds are ready upon arrival.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Chicken Catalog Listing Section */}
+            <section className="py-12 px-4 sm:px-8 max-w-7xl mx-auto space-y-8 font-sans">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl border border-stone-200 shadow-sm">
+                {/* Age Stage Filters */}
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto">
+                  {['All', '4 Months Old', '5 Months Old', '6 Months Old & Older'].map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(cat)}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                        selectedCategory === cat
+                          ? 'bg-[#8B3E0C] text-white'
+                          : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Search Field */}
+                <div className="relative w-full sm:w-64">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+                  <input
+                    type="text"
+                    placeholder="Search breed or age..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 text-xs bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-800"
+                  />
+                </div>
+              </div>
+
+              {/* Grid Layout for Products */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredProducts.map((product) => (
+                  <div 
+                    key={product.id}
+                    className="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+                  >
+                    <div>
+                      {/* Product Image Header with Tags */}
+                      <div className="relative h-60 bg-stone-100 overflow-hidden">
+                        <img 
+                          src={product.image} 
+                          alt={product.name} 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-3 left-3 bg-stone-900/90 text-white px-3 py-1 rounded-md text-[11px] font-bold flex items-center gap-1.5">
+                          <span className="text-amber-400">📅</span> {product.ageCategory}
+                        </div>
+                        <div className="absolute top-3 right-3 bg-amber-500 text-stone-950 font-black px-3 py-1 rounded-md text-xs shadow">
+                          ₱{product.price}
+                        </div>
+                      </div>
+
+                      {/* Content Body */}
+                      <div className="p-5 space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] font-bold tracking-wider text-amber-900 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded uppercase">
+                            {product.breed}
+                          </span>
+                          <div className="flex items-center gap-1 text-xs font-bold text-stone-700">
+                            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                            <span>{product.rating}</span>
+                          </div>
+                        </div>
+
+                        <h3 className="font-bold text-base text-stone-900 font-serif">
+                          {product.name}
+                        </h3>
+
+                        <p className="text-xs text-stone-500 leading-relaxed line-clamp-2">
+                          {product.description}
+                        </p>
+
+                        <div className="grid grid-cols-2 gap-2 bg-stone-50 p-2.5 rounded-xl text-[11px] border border-stone-100">
+                          <div>
+                            <span className="text-stone-400 block font-medium">Est. Weight</span>
+                            <span className="font-bold text-stone-800">{product.weight}</span>
+                          </div>
+                          <div>
+                            <span className="text-stone-400 block font-medium">In Stock</span>
+                            <span className="font-bold text-emerald-700">{product.stock} heads</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-5 pt-0 flex items-center gap-2">
+                      <button
+                        onClick={() => setDetailProduct(product)}
+                        className="p-2.5 border border-stone-300 hover:bg-stone-50 rounded-xl text-stone-600"
+                        title="View Info"
+                      >
+                        <Info className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => addToCart(product)}
+                        className="flex-1 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold py-2.5 px-4 rounded-xl text-xs shadow transition-all flex items-center justify-center gap-2"
+                      >
+                        <ShoppingBag className="w-4 h-4" />
+                        <span>Add To Order</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-center pt-8">
+                <button 
+                  onClick={() => setActiveTab('menu')}
+                  className="bg-white hover:bg-stone-50 text-[#8B3E0C] font-semibold px-8 py-3 rounded-2xl border-2 border-[#8B3E0C] shadow-sm transition-all text-sm"
+                >
+                  View Full Menu
+                </button>
+              </div>
+            </section>
+
+            {/* Why Choose Section */}
+            <section className="bg-[#8B3E0C] text-white py-10 text-center mt-12">
+              <h2 className="text-3xl sm:text-4xl font-serif font-medium text-amber-100">
+                Why Choose Jasmine's Poultry?
+              </h2>
+            </section>
+
+            <section className="py-12 px-4 sm:px-8 max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 font-sans">
+                <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm text-center space-y-3">
+                  <h3 className="font-bold text-base text-amber-900 font-serif">Healthy Stock</h3>
+                  <p className="text-xs text-stone-600 leading-relaxed">
+                    Raised under strict health standards with complete vaccination records.
+                  </p>
+                </div>
+
+                <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm text-center space-y-3">
+                  <h3 className="font-bold text-base text-amber-900 font-serif">High Yield Breeds</h3>
+                  <p className="text-xs text-stone-600 leading-relaxed">
+                    Selected for proven egg productivity and rapid climate adaptation.
+                  </p>
+                </div>
+
+                <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm text-center space-y-3">
+                  <h3 className="font-bold text-base text-amber-900 font-serif">Convenient Pre-Order</h3>
+                  <p className="text-xs text-stone-600 leading-relaxed">
+                    Reserve your birds online and pick them up at your scheduled convenience.
+                  </p>
+                </div>
+
+                <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm text-center space-y-3">
+                  <h3 className="font-bold text-base text-amber-900 font-serif">Variety of Age Stages</h3>
+                  <p className="text-xs text-stone-600 leading-relaxed">
+                    From 4-month growers to 6-month active laying hens and breeding pairs.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Reviews Section */}
+            <section className="bg-[#8B3E0C] text-white py-8 text-center">
+              <h2 className="text-3xl font-serif text-amber-100">Customer Reviews</h2>
+              <p className="text-xs text-amber-200/80 font-sans mt-1">What local poultry raisers say</p>
+            </section>
+
+            <section className="py-12 text-center bg-white border-y border-stone-200">
+              <div className="max-w-md mx-auto space-y-2 font-sans">
+                <p className="text-sm font-semibold text-stone-600">Customer reviews coming soon.</p>
+                <p className="text-xs text-stone-400">Be the first to leave a review after your purchase!</p>
+              </div>
+            </section>
+
+            {/* Newsletter Section */}
+            <section className="bg-[#8B3E0C] text-white py-16 px-4 text-center font-sans">
+              <div className="max-w-3xl mx-auto space-y-6">
+                <h2 className="text-4xl font-serif font-medium text-white">Stay Updated</h2>
+                <p className="text-amber-100/90 text-sm font-light max-w-lg mx-auto">
+                  Get notified about new chicken batches, egg layers, and farm specials delivered straight to your inbox.
+                </p>
+
+                <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row justify-center items-center gap-3 max-w-md mx-auto pt-2">
+                  <input
+                    type="email"
+                    required
+                    placeholder="Enter your email"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    className="w-full sm:w-auto flex-1 px-4 py-3 rounded-xl text-stone-900 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-300"
+                  />
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto bg-[#6E300B] hover:bg-[#592607] text-white font-semibold px-6 py-3 rounded-xl text-sm border border-amber-800 transition-all"
+                  >
+                    Subscribe
+                  </button>
+                </form>
+
+                <p className="text-[11px] text-amber-200/60">
+                  We respect your privacy. Unsubscribe anytime.
+                </p>
+              </div>
+            </section>
+          </div>
+        )}
+
+        {/* TAB: ABOUT PAGE */}
+        {activeTab === 'about' && (
+          <div className="max-w-4xl mx-auto px-4 py-12 space-y-8 font-sans">
+            <div className="text-center space-y-3">
+              <h1 className="text-4xl font-serif font-bold text-stone-900">About Jasmine's Poultry</h1>
+              <p className="text-stone-600 text-sm max-w-xl mx-auto">
+                Dedicated to breeding and supplying healthy, high-grade chickens across the Philippines.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl border border-stone-200 space-y-4 leading-relaxed text-sm text-stone-700">
+              <h2 className="text-xl font-bold font-serif text-stone-900">Our Farm Standard</h2>
+              <p>
+                Jasmine's Poultry offers starter pullets, point-of-lay layers, and heritage breeding pairs. All birds are raised with optimal feeds, deworming, and complete vaccinations.
+              </p>
+              <p>
+                We focus on disease resistance, high egg output, and docile temperaments suitable for backyard and commercial raisers.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: ADMIN PANEL */}
+        {activeTab === 'admin' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-6 font-sans">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-6 rounded-2xl border border-stone-200">
+              <div>
+                <h1 className="text-2xl font-bold text-stone-900 flex items-center gap-2 font-serif">
+                  <LayoutDashboard className="w-6 h-6 text-amber-800" />
+                  Chicken Inventory Dashboard
+                </h1>
+                <p className="text-xs text-stone-500">Manage chicken listings, ages, and PHP pricing</p>
+              </div>
+
+              <button
+                onClick={() => handleOpenAdminModal()}
+                className="bg-[#8B3E0C] hover:bg-[#6E300B] text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" /> Add Chicken Listing
+              </button>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-stone-200 overflow-x-auto shadow-sm">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-stone-50 text-stone-600 font-bold border-b border-stone-200">
+                    <th className="p-4">Chicken Listing</th>
+                    <th className="p-4">Age Category</th>
+                    <th className="p-4">Price (PHP)</th>
+                    <th className="p-4">Stock</th>
+                    <th className="p-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-100">
+                  {products.map(product => (
+                    <tr key={product.id} className="hover:bg-stone-50">
+                      <td className="p-4 font-bold text-stone-900">{product.name}</td>
+                      <td className="p-4">
+                        <span className="bg-amber-100 text-amber-900 px-2.5 py-1 rounded-full font-semibold">
+                          {product.ageCategory}
+                        </span>
+                      </td>
+                      <td className="p-4 font-black">₱{product.price}</td>
+                      <td className="p-4">{product.stock} heads</td>
+                      <td className="p-4 text-right space-x-2">
+                        <button onClick={() => handleOpenAdminModal(product)} className="p-1.5 bg-stone-100 rounded text-stone-700">
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => handleDeleteProduct(product.id)} className="p-1.5 bg-red-50 rounded text-red-600">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-[#1C0E06] text-amber-100/80 text-xs py-12 border-t border-amber-950 font-sans">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-red-600 flex items-center justify-center text-xs">
+                🐔
+              </div>
+              <span className="text-base font-bold text-white font-serif">
+                Jasmine's Poultry
+              </span>
+            </div>
+            <p className="text-stone-400 text-xs leading-relaxed">
+              Healthy vaccinated chickens and point-of-lay pullets raised for high egg productivity.
+            </p>
+            <div className="flex items-center gap-3 pt-2">
+              <div className="w-8 h-8 rounded-full bg-stone-800 flex items-center justify-center hover:bg-amber-800 cursor-pointer transition-colors">
+                <Facebook className="w-4 h-4 text-white" />
+              </div>
+              <div className="w-8 h-8 rounded-full bg-stone-800 flex items-center justify-center hover:bg-amber-800 cursor-pointer transition-colors">
+                <Instagram className="w-4 h-4 text-white" />
+              </div>
+              <div className="w-8 h-8 rounded-full bg-stone-800 flex items-center justify-center hover:bg-amber-800 cursor-pointer transition-colors">
+                <Twitter className="w-4 h-4 text-white" />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="font-bold text-white font-serif text-sm">Visit Us</h3>
+            <p className="text-stone-400 leading-relaxed">
+              Poultry Farm Road, Davao City, Davao del Sur, Philippines
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="font-bold text-white font-serif text-sm">Hours</h3>
+            <div className="text-stone-400 space-y-1">
+              <p>Monday - Friday: 6:00 AM – 6:00 PM</p>
+              <p>Saturday: 6:00 AM – 5:00 PM</p>
+              <p>Sunday: 7:00 AM – 3:00 PM</p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="font-bold text-white font-serif text-sm">Contact</h3>
+            <div className="text-stone-400 space-y-2">
+              <p>+63 912 345 6789</p>
+              <p>info@jasminespoultry.ph</p>
+              <button 
+                onClick={() => setIsCartOpen(true)}
+                className="text-amber-300 font-semibold hover:underline block pt-2"
+              >
+                Place Order
+              </button>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* Cart Drawer */}
+      {isCartOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-end font-sans">
+          <div className="bg-white w-full max-w-md h-full shadow-2xl flex flex-col justify-between p-6">
+            <div className="flex justify-between items-center border-b pb-4">
+              <h3 className="text-base font-bold text-stone-900 font-serif">Your Chicken Order</h3>
+              <button onClick={() => setIsCartOpen(false)} className="p-1 text-stone-400 hover:text-stone-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto py-4 space-y-3">
+              {cart.length === 0 ? (
+                <div className="text-center py-12 text-stone-400 space-y-2">
+                  <ShoppingBag className="w-10 h-10 mx-auto text-stone-300" />
+                  <p className="font-semibold text-xs">Your cart is currently empty</p>
+                </div>
+              ) : (
+                cart.map(item => (
+                  <div key={item.id} className="flex gap-3 bg-stone-50 p-3 rounded-xl border border-stone-200">
+                    <img src={item.image} alt="" className="w-14 h-14 rounded-lg object-cover" />
+                    <div className="flex-1 flex flex-col justify-between">
+                      <h4 className="font-bold text-xs text-stone-900">{item.name}</h4>
+                      <div className="flex justify-between items-center">
+                        <span className="font-extrabold text-xs text-stone-900">₱{item.price * item.quantity}</span>
+                        <div className="flex items-center gap-2 bg-white px-2 py-0.5 rounded border border-stone-200 text-xs">
+                          <button onClick={() => updateCartQuantity(item.id, -1)} className="font-bold">-</button>
+                          <span>{item.quantity}</span>
+                          <button onClick={() => updateCartQuantity(item.id, 1)} className="font-bold">+</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {cart.length > 0 && (
+              <div className="border-t pt-4 space-y-3">
+                <div className="flex justify-between font-bold text-sm">
+                  <span>Total Amount:</span>
+                  <span className="text-[#8B3E0C]">₱{cartTotal}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    showToast('Pre-order submitted successfully!');
+                    setCart([]);
+                    setIsCartOpen(false);
+                  }}
+                  className="w-full bg-[#8B3E0C] hover:bg-[#6E300B] text-white font-bold py-3 rounded-xl text-xs transition-all"
+                >
+                  Confirm Pre-Order
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Product Detail Modal */}
+      {detailProduct && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 font-sans">
+          <div className="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl border border-stone-200 space-y-4">
+            <div className="relative h-48 bg-stone-100">
+              <img src={detailProduct.image} className="w-full h-full object-cover" alt="" />
+              <button 
+                onClick={() => setDetailProduct(null)}
+                className="absolute top-3 right-3 bg-black/50 text-white p-1.5 rounded-full hover:bg-black/70"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-6 pt-0 space-y-3 text-xs">
+              <div className="flex justify-between items-center">
+                <span className="bg-amber-100 text-amber-900 font-bold px-2.5 py-0.5 rounded">
+                  {detailProduct.breed}
+                </span>
+                <span className="text-base font-black text-[#8B3E0C]">₱{detailProduct.price}</span>
+              </div>
+              <h3 className="text-lg font-bold font-serif text-stone-900">{detailProduct.name}</h3>
+              <p className="text-stone-600 leading-relaxed">{detailProduct.description}</p>
+              
+              <div className="space-y-2 bg-stone-50 p-3 rounded-xl border border-stone-100">
+                <div><strong className="text-stone-800">Vaccines:</strong> {detailProduct.healthStatus}</div>
+                <div><strong className="text-stone-800">Egg Potential:</strong> {detailProduct.eggPotential}</div>
+              </div>
+
+              <button
+                onClick={() => {
+                  addToCart(detailProduct);
+                  setDetailProduct(null);
+                }}
+                className="w-full bg-[#8B3E0C] text-white font-bold py-3 rounded-xl text-xs"
+              >
+                Add To Order Basket
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Modal */}
+      {adminModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 font-sans">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-stone-200 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center">
+              <h3 className="font-bold text-base font-serif">
+                {editingProduct ? 'Edit Chicken Listing' : 'Add New Chicken Listing'}
+              </h3>
+              <button onClick={() => setAdminModalOpen(false)}>
+                <X className="w-5 h-5 text-stone-400" />
+              </button>
+            </div>
+            <form onSubmit={handleSaveProduct} className="space-y-3 text-xs">
+              <div>
+                <label className="block font-bold mb-1">Listing Title</label>
+                <input
+                  type="text"
+                  required
+                  value={adminForm.name}
+                  onChange={(e) => setAdminForm({ ...adminForm, name: e.target.value })}
+                  placeholder="e.g. 4-Month Old Starter Pullet"
+                  className="w-full p-2.5 bg-stone-50 border rounded-xl"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold mb-1">Age Category</label>
+                <select
+                  value={adminForm.ageCategory}
+                  onChange={(e) => setAdminForm({ ...adminForm, ageCategory: e.target.value })}
+                  className="w-full p-2.5 bg-stone-50 border rounded-xl"
+                >
+                  <option>4 Months Old</option>
+                  <option>5 Months Old</option>
+                  <option>6 Months Old & Older</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold mb-1">Breed Name</label>
+                <input
+                  type="text"
+                  value={adminForm.breed}
+                  onChange={(e) => setAdminForm({ ...adminForm, breed: e.target.value })}
+                  placeholder="e.g. RHODE ISLAND RED"
+                  className="w-full p-2.5 bg-stone-50 border rounded-xl"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold mb-1">Price (₱ PHP)</label>
+                  <input
+                    type="number"
+                    required
+                    value={adminForm.price}
+                    onChange={(e) => setAdminForm({ ...adminForm, price: e.target.value })}
+                    className="w-full p-2.5 bg-stone-50 border rounded-xl"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold mb-1">Stock (Heads)</label>
+                  <input
+                    type="number"
+                    required
+                    value={adminForm.stock}
+                    onChange={(e) => setAdminForm({ ...adminForm, stock: e.target.value })}
+                    className="w-full p-2.5 bg-stone-50 border rounded-xl"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold mb-1">Image URL</label>
+                <input
+                  type="text"
+                  value={adminForm.image}
+                  onChange={(e) => setAdminForm({ ...adminForm, image: e.target.value })}
+                  className="w-full p-2.5 bg-stone-50 border rounded-xl"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold mb-1">Description</label>
+                <textarea
+                  rows="3"
+                  value={adminForm.description}
+                  onChange={(e) => setAdminForm({ ...adminForm, description: e.target.value })}
+                  className="w-full p-2.5 bg-stone-50 border rounded-xl"
+                />
+              </div>
+
+              <button type="submit" className="w-full bg-[#8B3E0C] text-white font-bold py-2.5 rounded-xl text-xs">
+                Save Listing
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Auth Modal */}
+      {isAuthModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 font-sans">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-stone-200 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="font-bold text-lg font-serif">Sign In to Jasmine's Poultry</h3>
+              <button onClick={() => setIsAuthModalOpen(false)}>
+                <X className="w-5 h-5 text-stone-400" />
+              </button>
+            </div>
+            <form onSubmit={handleAuthSubmit} className="space-y-3 text-xs">
+              <div>
+                <label className="block font-bold mb-1">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={authForm.email}
+                  onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
+                  placeholder="name@example.com"
+                  className="w-full p-2.5 bg-stone-50 border rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="block font-bold mb-1">Password</label>
+                <input
+                  type="password"
+                  required
+                  value={authForm.password}
+                  onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+                  placeholder="••••••••"
+                  className="w-full p-2.5 bg-stone-50 border rounded-xl"
+                />
+              </div>
+              <button type="submit" className="w-full bg-[#8B3E0C] text-white font-bold py-2.5 rounded-xl text-xs">
+                Log In
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
